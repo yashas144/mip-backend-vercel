@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/index.py": {
+    "app/main.py": {
       "maxDuration": 300,
       "memory": 3009
     }
@@ -9,7 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/index.py"
+      "dest": "/app/main.py"
     }
   ]
 }
