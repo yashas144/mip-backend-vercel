@@ -1,0 +1,12 @@
+fastapi
+pandas
+numpy
+pyarrow
+python-dotenv
+scikit-learn
+requests
+pydantic
+sentence-transformers
+faiss-cpu
+rank-bm25
+openai==1.95.1
