@@ -11,7 +11,7 @@ load_dotenv()
 DATA_PATH = os.getenv("DATA_PATH", "./data/spotify_dataset.csv")
 ARTIFACT_DIR = os.getenv("ARTIFACT_DIR", "./artifacts")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-MAX_ROWS = int(os.getenv("MAX_ROWS", "10000"))
+MAX_ROWS = int(os.getenv("MAX_ROWS", "1000"))
 USE_GPU = os.getenv("USE_GPU", "false").lower() == "true"
 
 PARQUET_PATH = os.path.join(ARTIFACT_DIR, "songs.parquet")
