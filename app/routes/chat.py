@@ -5,11 +5,6 @@ from app.services.recommendation_service import recommendation_service
 router = APIRouter()
 
 
-@router.on_event("startup")
-def startup_event():
-    recommendation_service.initialize()
-
-
 @router.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     try:
