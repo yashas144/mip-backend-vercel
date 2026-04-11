@@ -172,7 +172,7 @@ class RecommendationService:
         if not self.initialized:
             self.initialize()
 
-        retrieved = hybrid_retriever.hybrid_search(query, top_k=40)
+        retrieved = hybrid_retriever.hybrid_search(query, top_k=15)
 
         rows = []
         for item in retrieved:
