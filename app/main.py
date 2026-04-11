@@ -6,7 +6,10 @@ app = FastAPI(title="AI Music Intelligence Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://mip-frontend-fsdzbwfzc3frahg6.centralus-01.azurewebsites.net",
+        "http://localhost:3000",  # keep this for local dev
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
