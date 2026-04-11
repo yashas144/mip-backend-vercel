@@ -1,3 +1,4 @@
+import gc
 import os
 import pickle
 import numpy as np
@@ -39,16 +40,29 @@ class HybridRetriever:
             return
 
         device = self._get_device()
-        self.model = SentenceTransformer(EMBEDDING_MODEL, device=device)
+
+        # Load model with cache folder to avoid re-downloading on restart
+        self.model = SentenceTransformer(
+            EMBEDDING_MODEL,
+            device=device,
+            cache_folder="/tmp/model_cache",
+        )
+
+        # Load FAISS index
         self.index = faiss.read_index(FAISS_PATH)
 
+        # Load BM25 tokenized corpus
         with open(BM25_TOKENS_PATH, "rb") as f:
             tokenized_corpus = pickle.load(f)
 
         self.bm25 = BM25Okapi(tokenized_corpus)
+
+        # Free memory used during loading
+        gc.collect()
+
         self.initialized = True
 
-    def dense_search(self, query: str, top_k: int = 50):
+    def dense_search(self, query: str, top_k: int = 15):  # reduced from 50
         q_emb = self.model.encode(
             [query],
             convert_to_numpy=True,
@@ -56,6 +70,11 @@ class HybridRetriever:
         ).astype("float32")
 
         scores, indices = self.index.search(q_emb, top_k)
+
+        # Free embedding memory immediately
+        del q_emb
+        gc.collect()
+
         results = []
         for rank, (idx, score) in enumerate(zip(indices[0], scores[0]), start=1):
             if idx >= 0:
@@ -66,7 +85,7 @@ class HybridRetriever:
                 })
         return results
 
-    def bm25_search(self, query: str, top_k: int = 50):
+    def bm25_search(self, query: str, top_k: int = 15):  # reduced from 50
         tokens = PreprocessingService.tokenize(query)
         scores = self.bm25.get_scores(tokens)
         top_idx = np.argsort(scores)[::-1][:top_k]
@@ -78,9 +97,14 @@ class HybridRetriever:
                 "bm25_score": float(scores[idx]),
                 "bm25_rank": rank,
             })
+
+        # Free scores array memory
+        del scores
+        gc.collect()
+
         return results
 
-    def hybrid_search(self, query: str, top_k: int = 30, rrf_k: int = 60):
+    def hybrid_search(self, query: str, top_k: int = 15, rrf_k: int = 60):  # reduced from 30
         dense = self.dense_search(query, top_k=top_k)
         sparse = self.bm25_search(query, top_k=top_k)
 
