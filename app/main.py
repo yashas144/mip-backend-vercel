@@ -1,18 +1,8 @@
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.chat import router as chat_router
-from app.services.recommendation_service import recommendation_service
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Load models once at startup — prevents memory spike on first request
-    recommendation_service.initialize()
-    yield
-
-
-app = FastAPI(title="AI Music Intelligence Backend", lifespan=lifespan)
+app = FastAPI(title="AI Music Intelligence Backend")
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,7 +16,6 @@ app.add_middleware(
 )
 
 app.include_router(chat_router)
-
 
 @app.get("/")
 def root():
